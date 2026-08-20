@@ -49,6 +49,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify generated route tree
+        run: |
+          pnpm routes:generate
+          git ls-files --error-unmatch src/routeTree.gen.ts
+          git diff --exit-code -- src/routeTree.gen.ts
+
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 

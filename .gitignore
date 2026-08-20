@@ -6,4 +6,3 @@ coverage/
 playwright-report/
 test-results/
 .env
-src/routeTree.gen.ts
