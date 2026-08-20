@@ -1,6 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const e2eFingerprint = `203.0.113.${(Date.now() % 200) + 1}`
+const webServerHost = '127.0.0.1'
+const webServerPort = 3100
+const webServerBaseUrl = `http://${webServerHost}:${webServerPort}`
 
 export default defineConfig({
   testDir: './e2e',
@@ -8,15 +11,16 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',
   use: {
-    baseURL: 'http://127.0.0.1:3100',
+    baseURL: webServerBaseUrl,
     trace: 'on-first-retry',
     extraHTTPHeaders: {
       'x-forwarded-for': e2eFingerprint,
     },
   },
   webServer: {
-    command: 'pnpm db:migrate:runtime && pnpm dev --port 3100',
-    url: 'http://127.0.0.1:3100',
+    command: `pnpm db:migrate:runtime && pnpm dev --host ${webServerHost} --port ${webServerPort} --strictPort`,
+    url: `${webServerBaseUrl}/api/health/ready`,
+    timeout: 120_000,
     env: {
       DATABASE_URL:
         process.env.DATABASE_URL ??
